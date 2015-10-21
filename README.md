@@ -1,4 +1,8 @@
-# angular-busy [![Build Status](https://travis-ci.org/cgross/angular-busy.png?branch=master)](https://travis-ci.org/cgross/angular-busy)
+# angular-busy2
+
+This is just fork of [angular-busy] with CommonJS compatibility specially for using with Webpack.  
+I just needed to do this copy, be course pull requests to original repo were waiting too long.  
+And npm version was always outdated, and for me it's the main package manager.
 
 > Show busy/loading indicators on any $http or $resource request, or on any promise.
 
@@ -91,6 +95,7 @@ Only the values you'd like overriden need to be specified.
 
 
 ## Release History
+ * v4.1.4 - Updated for Angular 1.4.5 + CommonJS compatibility
  * v4.1.3 - Fix for issue #45 and issue #49.
  * v4.1.2 - Small bugs fixed, wrapperClass option added.
  * v4.1.1 - Compatibility with Angular 1.3.
