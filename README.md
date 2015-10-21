@@ -1,6 +1,6 @@
 # angular-busy2
 
-This is just fork of [angular-busy] with CommonJS compatibility specially for using with Webpack.  
+This is just fork of [angular-busy](https://github.com/cgross/angular-busy) with CommonJS compatibility specially for using with Webpack.  
 I just needed to do this copy, be course pull requests to original repo were waiting too long.  
 And npm version was always outdated, and for me it's the main package manager.
 
