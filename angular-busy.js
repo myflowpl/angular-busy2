@@ -40,15 +40,51 @@ angular.module('cgBusy').factory('_cgBusyTrackerFactory',['$timeout','$q',functi
                 },parseInt(options.minDuration,10) + (options.delay ? parseInt(options.delay,10) : 0));
             }
         };
+        tracker.isRealPromise = function (promiseThing) {
 
-        tracker.isPromise = function(promiseThing){
             var then = promiseThing && (promiseThing.then || promiseThing.$then ||
                 (promiseThing.$promise && promiseThing.$promise.then));
 
             return typeof then !== 'undefined';
         };
+        tracker.isPromise = function(promiseThing){
+            if (promiseThing === true || promiseThing === false) {
+                return true;
+            }
+            if (angular.isNumber(promiseThing)) {
+                return true;
+            }
 
+            var then = promiseThing && (promiseThing.then || promiseThing.$then ||
+                (promiseThing.$promise && promiseThing.$promise.then));
+
+            return typeof then !== 'undefined';
+        };
+        tracker.hide = function(promiseThing){
+            if(promiseThing === false){
+                return true;
+            }
+
+            if(promiseThing.promise === false){
+                return true;
+            }
+            if(angular.isNumber(promiseThing) === true && promiseThing <= 0){
+                return true;
+            }
+            if(angular.isNumber(promiseThing.promise) === true && promiseThing.promise <= 0){
+                return true;
+            }
+        };
         tracker.callThen = function(promiseThing,success,error){
+            
+            if(tracker.hide(promiseThing)){
+                success();
+                return;
+            }
+            if(!tracker.isRealPromise(promiseThing)){
+                return;
+            }
+
             var promise;
             if (promiseThing.then || promiseThing.$then){
                 promise = promiseThing;
@@ -149,6 +185,20 @@ angular.module('cgBusy').directive('cgBusy',['$compile','$templateCache','cgBusy
                 angular.extend(defaults,cgBusyDefaults);
 
                 scope.$watchCollection(attrs.cgBusy,function(options){
+
+                    var showForce = null;
+                    if (options === true) {
+                        options = {promise:true};
+                    } else if (options === false) {
+                        options = {promise:null};
+                    } else if (angular.isNumber(options) === true) {
+                        if (options > 0) {
+                            options = {promise:true};
+                        } else {
+                            options = {promise:null};
+                        }
+                    }
+
 
                     if (!options) {
                         options = {promise:null};

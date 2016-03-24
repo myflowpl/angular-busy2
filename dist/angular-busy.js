@@ -40,15 +40,51 @@ angular.module('cgBusy').factory('_cgBusyTrackerFactory',['$timeout','$q',functi
                 },parseInt(options.minDuration,10) + (options.delay ? parseInt(options.delay,10) : 0));
             }
         };
+        tracker.isRealPromise = function (promiseThing) {
 
-        tracker.isPromise = function(promiseThing){
             var then = promiseThing && (promiseThing.then || promiseThing.$then ||
                 (promiseThing.$promise && promiseThing.$promise.then));
 
             return typeof then !== 'undefined';
         };
+        tracker.isPromise = function(promiseThing){
+            if (promiseThing === true || promiseThing === false) {
+                return true;
+            }
+            if (angular.isNumber(promiseThing)) {
+                return true;
+            }
 
+            var then = promiseThing && (promiseThing.then || promiseThing.$then ||
+                (promiseThing.$promise && promiseThing.$promise.then));
+
+            return typeof then !== 'undefined';
+        };
+        tracker.hide = function(promiseThing){
+            if(promiseThing === false){
+                return true;
+            }
+
+            if(promiseThing.promise === false){
+                return true;
+            }
+            if(angular.isNumber(promiseThing) === true && promiseThing <= 0){
+                return true;
+            }
+            if(angular.isNumber(promiseThing.promise) === true && promiseThing.promise <= 0){
+                return true;
+            }
+        };
         tracker.callThen = function(promiseThing,success,error){
+            
+            if(tracker.hide(promiseThing)){
+                success();
+                return;
+            }
+            if(!tracker.isRealPromise(promiseThing)){
+                return;
+            }
+
             var promise;
             if (promiseThing.then || promiseThing.$then){
                 promise = promiseThing;
@@ -150,6 +186,20 @@ angular.module('cgBusy').directive('cgBusy',['$compile','$templateCache','cgBusy
 
                 scope.$watchCollection(attrs.cgBusy,function(options){
 
+                    var showForce = null;
+                    if (options === true) {
+                        options = {promise:true};
+                    } else if (options === false) {
+                        options = {promise:null};
+                    } else if (angular.isNumber(options) === true) {
+                        if (options > 0) {
+                            options = {promise:true};
+                        } else {
+                            options = {promise:null};
+                        }
+                    }
+
+
                     if (!options) {
                         options = {promise:null};
                     }
@@ -242,58 +292,34 @@ angular.module('cgBusy').directive('cgBusy',['$compile','$templateCache','cgBusy
     }
 ]);
 
-
 angular.module('cgBusy').run(['$templateCache', function($templateCache) {
-    'use strict';
+  'use strict';
 
-    $templateCache.put('angular-busy.html',
-        "<div class=\"cg-busy-default-wrapper\">\r" +
-        "\n" +
-        "\r" +
-        "\n" +
-        "   <div class=\"cg-busy-default-sign\">\r" +
-        "\n" +
-        "\r" +
-        "\n" +
-        "      <div class=\"cg-busy-default-spinner\">\r" +
-        "\n" +
-        "         <div class=\"bar1\"></div>\r" +
-        "\n" +
-        "         <div class=\"bar2\"></div>\r" +
-        "\n" +
-        "         <div class=\"bar3\"></div>\r" +
-        "\n" +
-        "         <div class=\"bar4\"></div>\r" +
-        "\n" +
-        "         <div class=\"bar5\"></div>\r" +
-        "\n" +
-        "         <div class=\"bar6\"></div>\r" +
-        "\n" +
-        "         <div class=\"bar7\"></div>\r" +
-        "\n" +
-        "         <div class=\"bar8\"></div>\r" +
-        "\n" +
-        "         <div class=\"bar9\"></div>\r" +
-        "\n" +
-        "         <div class=\"bar10\"></div>\r" +
-        "\n" +
-        "         <div class=\"bar11\"></div>\r" +
-        "\n" +
-        "         <div class=\"bar12\"></div>\r" +
-        "\n" +
-        "      </div>\r" +
-        "\n" +
-        "\r" +
-        "\n" +
-        "      <div class=\"cg-busy-default-text\">{{$message}}</div>\r" +
-        "\n" +
-        "\r" +
-        "\n" +
-        "   </div>\r" +
-        "\n" +
-        "\r" +
-        "\n" +
-        "</div>"
-    );
+  $templateCache.put('angular-busy.html',
+    "<div class=\"cg-busy-default-wrapper\">\n" +
+    "\n" +
+    "   <div class=\"cg-busy-default-sign\">\n" +
+    "\n" +
+    "      <div class=\"cg-busy-default-spinner\">\n" +
+    "         <div class=\"bar1\"></div>\n" +
+    "         <div class=\"bar2\"></div>\n" +
+    "         <div class=\"bar3\"></div>\n" +
+    "         <div class=\"bar4\"></div>\n" +
+    "         <div class=\"bar5\"></div>\n" +
+    "         <div class=\"bar6\"></div>\n" +
+    "         <div class=\"bar7\"></div>\n" +
+    "         <div class=\"bar8\"></div>\n" +
+    "         <div class=\"bar9\"></div>\n" +
+    "         <div class=\"bar10\"></div>\n" +
+    "         <div class=\"bar11\"></div>\n" +
+    "         <div class=\"bar12\"></div>\n" +
+    "      </div>\n" +
+    "\n" +
+    "      <div class=\"cg-busy-default-text\">{{$message}}</div>\n" +
+    "\n" +
+    "   </div>\n" +
+    "\n" +
+    "</div>"
+  );
 
 }]);
