@@ -150,6 +150,17 @@ angular.module('cgBusy').directive('cgBusy',['$compile','$templateCache','cgBusy
 
                 scope.$watchCollection(attrs.cgBusy,function(options){
 
+                    var showForce = false;
+                    if(options === true){
+                        showForce = true;
+                    }
+                    if(angular.isNumber(options) === true && options > 0 ){
+                        showForce = true;
+                    }
+                    if(angular.isObject(options) === true && options.show && options.show === true ){
+                        showForce = true;
+                    }
+
                     if (!options) {
                         options = {promise:null};
                     }
@@ -194,6 +205,9 @@ angular.module('cgBusy').directive('cgBusy',['$compile','$templateCache','cgBusy
                     }
 
                     templateScope.$cgBusyIsActive = function() {
+                        if(showForce) {
+                            return true;
+                        }
                         return tracker.active();
                     };
 
